@@ -11,41 +11,83 @@ import {
 import "./App.css";
 import { FaUser, FaPhoneAlt, FaCalendarAlt, FaRandom } from "react-icons/fa";
 import { MdEmail, MdLocationPin } from "react-icons/md";
-import { useState } from "react";
-
-const data = {
-  picture:
-    "https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8aHVtYW4lMjBmYWNlfGVufDB8fDB8fA%3D%3D&w=1000&q=80",
-  name: "random",
-  dob: "random dob",
-  email: "random.com",
-  phone: "random number",
-  address: "random address",
-};
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Background from "./assets/Background.svg";
+import { ReactComponent as Loader } from "./assets/Loader.svg";
+import { motion } from "framer-motion";
 
 const referenceData = {
   name: "Hi, I am",
-  email: "My email is",
-  dob: "My birthday is",
-  phone: "My phone number is",
-  address: "I live in,",
+  email: "My Email is",
+  dob: "My Birthday is",
+  phone: "My Phone Number is",
+  address: "I Live in,",
 };
 
 function App() {
   const [reference, setReference] = useState(referenceData.name);
-  const [header, setHeader] = useState(data.name);
+  const [loading, setLoading] = useState(null);
+  const [header, setHeader] = useState("");
+  const [user, setUser] = useState({});
+
+  const getUser = async () => {
+    setLoading(true);
+    const response = await axios.get("https://randomuser.me/api/");
+    const user = response.data.results[0];
+    console.log(user);
+    const { phone, email } = user;
+    const { large: picture } = user.picture;
+    const { first, last } = user.name;
+    const { date: dob } = user.dob;
+    const { city, country } = user.location;
+
+    const newUser = {
+      picture,
+      name: `${first} ${last}`,
+      dob: dob.slice(0, 10),
+      address: `${city}, ${country}`,
+      phone,
+      email,
+    };
+    setUser(newUser);
+    setHeader(newUser.name);
+    setReference(referenceData.name);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  if (loading) {
+    return (
+      <VStack h="100vh" w="100vw" justifyContent="center">
+        <Loader />
+      </VStack>
+    );
+  }
 
   return (
     <VStack h="100vh" w="100vw" justifyContent="center">
-      <VStack p={4} w={{ base: "90vw", md: "50vw" }} border="2px" rowGap={5}>
-        <Center>
-          <Image src={data.picture} w="10rem" borderRadius="full" />
+      <VStack
+        w={{ base: "90vw", md: "50vw" }}
+        rowGap={5}
+        boxShadow="2xl"
+        borderRadius="lg"
+        overflow="hidden"
+        as={motion.div}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0, transition: { duration: 1.5 } }}
+      >
+        <Center bgImage={Background} p={4} w="100%">
+          <Image src={user.picture} w="10rem" borderRadius="full" />
         </Center>
         <VStack>
           <Text fontSize="lg" color="gray.400" fontWeight="bold">
             {reference}
           </Text>
-          <Heading>{header}</Heading>
+          <Heading fontSize={{ base: "xl", md: "3xl" }}>{header}</Heading>
         </VStack>
         <HStack w="80%" justifyContent="space-evenly">
           <IconButton
@@ -54,7 +96,7 @@ function App() {
             isRound
             onClick={() => {
               setReference(referenceData.name);
-              setHeader(data.name);
+              setHeader(user.name);
             }}
           />
           <IconButton
@@ -63,7 +105,7 @@ function App() {
             isRound
             onClick={() => {
               setReference(referenceData.dob);
-              setHeader(data.dob);
+              setHeader(user.dob);
             }}
           />
           <IconButton
@@ -72,7 +114,7 @@ function App() {
             isRound
             onClick={() => {
               setReference(referenceData.address);
-              setHeader(data.address);
+              setHeader(user.address);
             }}
           />
           <IconButton
@@ -81,21 +123,27 @@ function App() {
             isRound
             onClick={() => {
               setReference(referenceData.phone);
-              setHeader(data.phone);
+              setHeader(user.phone);
             }}
           />
           <IconButton
             icon={<MdEmail />}
             size="lg"
+            bg="transparent"
             isRound
             onClick={() => {
               setReference(referenceData.email);
-              setHeader(data.email);
+              setHeader(user.email);
             }}
           />
         </HStack>
-        <Center>
-          <Button rightIcon={<FaRandom />} colorScheme="blue">
+        <Center p={2}>
+          <Button
+            rightIcon={<FaRandom />}
+            colorScheme="blue"
+            bg="#385490"
+            onClick={getUser}
+          >
             Random
           </Button>
         </Center>
