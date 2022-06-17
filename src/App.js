@@ -129,7 +129,6 @@ function App() {
           <IconButton
             icon={<MdEmail />}
             size="lg"
-            bg="transparent"
             isRound
             onClick={() => {
               setReference(referenceData.email);
