@@ -2,6 +2,14 @@
 
 https://random-user-rajkp10.netlify.app
 
+# Tools Used
+
+This site was created using ReactJS, Chakra UI and Framer Motion
+
+# Preview
+
+![random-user](https://user-images.githubusercontent.com/96880670/190869500-5f2bf36a-23d4-44a5-84c9-c0f7db150e0b.jpg)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
